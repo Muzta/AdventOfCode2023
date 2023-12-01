@@ -8,23 +8,17 @@ const lines = readFileSync("./day01.txt", { encoding: "utf-8" }) // read day??.t
 const part1 = () => {
   const calibrationValues = [];
 
-  lines.map((line) => {
-    let firstDigit, lastDigit;
-
-    for (let i = 0; i < line.length; i++) {
-      if (firstDigit && lastDigit) break;
-
-      // Check if a number has been already found. If not, assign current one if it's a digit
-      if (!firstDigit && !isNaN(line[i])) firstDigit = line[i];
-      if (!lastDigit && !isNaN(line[line.length - 1 - i]))
-        lastDigit = line[line.length - 1 - i];
-    }
-
-    calibrationValues.push(Number(`${firstDigit}${lastDigit}`));
+  lines.forEach((line) => {
+    // Fetches all the digits of the line
+    const numbers = line.match(/\d/g);
+    // Save the number consisted of the first and last digit
+    calibrationValues.push(
+      Number(`${numbers[0]}${numbers[numbers.length - 1]}`)
+    );
   });
 
   const calibrationSum = calibrationValues.reduce(
-    (accumulator, value) => accumulator + value,
+    (sum, value) => sum + value,
     0
   );
 
