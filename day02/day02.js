@@ -39,7 +39,28 @@ const part1 = ({ containedCubes }) => {
 };
 
 const part2 = () => {
-  console.log(`Solution part 2 is: ${null}`);
+  const powersOfSets = [];
+
+  lines.forEach((line) => {
+    // Retain only the list of sets
+    line = line.split(":")[1].trim();
+    const nCubes = { red: 0, blue: 0, green: 0 };
+    // Split the line both by "," and ";", and save them as a list, being the first element the number of cubes and the second one the color
+    const pairOfCubes = line
+      .split(/[;,]/)
+      .map((pair) => pair.trim().split(" "));
+
+    pairOfCubes.forEach(
+      ([number, color]) => (nCubes[color] = Math.max(nCubes[color], number))
+    );
+
+    const power = Object.values(nCubes).reduce((mul, n) => mul * n, 1);
+    powersOfSets.push(power);
+  });
+
+  const sumOfPower = powersOfSets.reduce((sum, value) => sum + value, 0);
+
+  console.log(`Solution part 2 is: ${sumOfPower}`);
 };
 
 part1({
