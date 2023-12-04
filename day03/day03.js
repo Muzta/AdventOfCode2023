@@ -55,7 +55,74 @@ const part1 = () => {
 };
 
 const part2 = () => {
-  console.log(`Solution part 2 is: ${null}`);
+  const isValidCell = (x, y) =>
+    x >= 0 && x < matrix.length && y >= 0 && y < matrix[0].length;
+  const isNumber = (x, y) => isValidCell(x, y) && !isNaN(matrix[x][y]);
+  const isGear = (cell) => cell === "*";
+  const listOfGearRatios = [];
+
+  matrix.forEach((row, x) => {
+    row.forEach((cell, y) => {
+      if (isGear(cell)) {
+        const numberCoordinates = []; // This gear adjacent coords that are digits
+        const gearPartNumbers = new Set(); // Set of adjacent numbers to no bet repeated
+
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            // Fetches all adjacent numeric coords
+            if (isNumber(x + dx, y + dy))
+              numberCoordinates.push([x + dx, y + dy]);
+          }
+        }
+
+        numberCoordinates.forEach((numberCoord) => {
+          let currentNumber = matrix[numberCoord[0]][numberCoord[1]],
+            moveLeft = 1,
+            moveRight = 1;
+
+          findWholeNumber: while (true) {
+            const leftX = numberCoord[0],
+              leftY = numberCoord[1] - moveLeft,
+              rightX = numberCoord[0],
+              rightY = numberCoord[1] + moveRight;
+
+            // There are no additional digits on either the left or right side of the number
+            if (!isNumber(leftX, leftY) && !isNumber(rightX, rightY))
+              break findWholeNumber;
+
+            // If a digit is found on the left side, put it before the current number
+            if (isNumber(leftX, leftY)) {
+              const previousCellDigit = matrix[leftX][leftY];
+              currentNumber = `${previousCellDigit}${currentNumber}`;
+              moveLeft++;
+            }
+
+            // If a digit is found on the right side, put it after the current number
+            if (isNumber(rightX, rightY)) {
+              const previousCellDigit = matrix[rightX][rightY];
+              currentNumber = `${currentNumber}${previousCellDigit}`;
+              moveRight++;
+            }
+          }
+
+          gearPartNumbers.add(currentNumber);
+        });
+
+        const lsGearPartNumbers = [...gearPartNumbers];
+        if (lsGearPartNumbers.length === 2) {
+          const gearRatio = lsGearPartNumbers[0] * lsGearPartNumbers[1];
+          listOfGearRatios.push(gearRatio);
+        }
+      }
+    });
+  });
+
+  const sumOfGearRatios = listOfGearRatios.reduce(
+    (sum, ratio) => sum + ratio,
+    0
+  );
+
+  console.log(`Solution part 2 is: ${sumOfGearRatios}`);
 };
 
 part1();
