@@ -5,7 +5,7 @@ const lines = readFileSync("day05.txt", { encoding: "utf-8" }) // read day??.txt
   .trim() // Remove starting/ending whitespace
   .split("\n"); // Split on newline
 
-const part1 = () => {
+const commonExercise = (exercise) => {
   // Initialize the rangesMap
   let seeds,
     seedSoil,
@@ -16,8 +16,6 @@ const part1 = () => {
     tempHum,
     humLocation;
 
-  const locations = [];
-
   // Convert each numeric line into an array of numbers...
   const parseList = (data) => data.split(" ").map(Number);
   // ... and each section into a list of lists
@@ -25,6 +23,8 @@ const part1 = () => {
 
   let currentSection = null; // Name of the current section
   let sectionLines = []; // Store the lines of numbers of this section
+
+  let minLocation; // Min location found
 
   lines.forEach((line, index) => {
     if (line.startsWith("seeds")) seeds = parseList(line.split(":")[1].trim());
@@ -81,24 +81,49 @@ const part1 = () => {
     return conversion;
   };
 
-  seeds.forEach((seed) => {
-    const soil = findConversion(seed, seedSoil);
-    const fert = findConversion(soil, soilFert);
-    const water = findConversion(fert, fertWater);
-    const light = findConversion(water, waterLight);
-    const temp = findConversion(light, lightTemp);
-    const hum = findConversion(temp, tempHum);
-    const location = findConversion(hum, humLocation);
-    locations.push(location);
+  seeds.forEach((seed, index) => {
+    if (exercise === "First") {
+      const soil = findConversion(seed, seedSoil);
+      const fert = findConversion(soil, soilFert);
+      const water = findConversion(fert, fertWater);
+      const light = findConversion(water, waterLight);
+      const temp = findConversion(light, lightTemp);
+      const hum = findConversion(temp, tempHum);
+      const location = findConversion(hum, humLocation);
+      minLocation = minLocation ? Math.min(location, minLocation) : location;
+    } else if (exercise === "Second") {
+      if (index % 2 == 0) {
+        const range = seeds[index + 1];
+
+        for (let i = 0; i < range; i++) {
+          const soil = findConversion(seeds[index] + i, seedSoil);
+          const fert = findConversion(soil, soilFert);
+          const water = findConversion(fert, fertWater);
+          const light = findConversion(water, waterLight);
+          const temp = findConversion(light, lightTemp);
+          const hum = findConversion(temp, tempHum);
+          const location = findConversion(hum, humLocation);
+          minLocation = minLocation
+            ? Math.min(location, minLocation)
+            : location;
+        }
+      }
+    }
   });
 
-  const lowestLocation = Math.min(...locations);
+  return minLocation;
+};
+
+const part1 = () => {
+  const lowestLocation = commonExercise("First");
 
   console.log(`Solution part 1 is: ${lowestLocation}`);
 };
 
 const part2 = () => {
-  console.log(`Solution part 2 is: ${null}`);
+  const minLocation = commonExercise("Second");
+
+  console.log(`Solution part 2 is: ${minLocation}`);
 };
 
 part1();
