@@ -46,7 +46,36 @@ const part1 = () => {
 };
 
 const part2 = () => {
-  console.log(`Solution part 2 is: ${null}`);
+  let raceTime, raceDistance;
+
+  lines.forEach((line) => {
+    const [key, value] = line.split(":");
+    const data = value.trim().split(" ").filter(Number);
+
+    if (key.startsWith("Time")) raceTime = Number(data.join(""));
+    else if (key.startsWith("Distance")) raceDistance = Number(data.join(""));
+  });
+
+  let minHoldButton;
+
+  // Calculate min time holding the button to win the race
+  for (let holdButton = 0; holdButton < raceTime; holdButton++) {
+    const travelSpeed = holdButton;
+    const restTimeTravel = raceTime - holdButton;
+
+    // Check if this holding time ensures winning the race
+    if (restTimeTravel * travelSpeed > raceDistance) {
+      minHoldButton = holdButton;
+      break;
+    }
+  }
+
+  // Total ways of winning this race is distance from min time holding to half the time available
+  const timeHalved = Math.ceil(raceTime / 2);
+  const extraWayIfEven = raceTime % 2 === 0 ? 1 : 0;
+  const nWaysThisRace = (timeHalved - minHoldButton) * 2 + extraWayIfEven;
+
+  console.log(`Solution part 2 is: ${nWaysThisRace}`);
 };
 
 part1();
