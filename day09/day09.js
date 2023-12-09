@@ -19,12 +19,23 @@ const generateSubsequences = (listOfSequences) => {
   return generateSubsequences(listOfSequences);
 };
 
-const getNextValue = (listOfSequences) => {
-  const listOfLastNumbers = listOfSequences.map((sequence) =>
-    lodash.last(sequence)
+const getExtrapolatedValue = (listOfSequences, positionToWorkWith) => {
+  const listOfEdgeNumbers = listOfSequences.map((sequence) =>
+    positionToWorkWith === "last"
+      ? lodash.last(sequence)
+      : lodash.first(sequence)
   ); // Last number of each sequence
-  const nextValue = lodash.sum(listOfLastNumbers);
-  return nextValue;
+
+  if (positionToWorkWith === "last") return lodash.sum(listOfEdgeNumbers);
+  else {
+    // Replace each number, from bottom to start, by itself minus the next first number
+    const begginingValues = lodash.forEachRight(
+      listOfEdgeNumbers,
+      (_, index) =>
+        (listOfEdgeNumbers[index] -= listOfEdgeNumbers[index + 1] || 0)
+    );
+    return lodash.first(begginingValues);
+  }
 };
 
 const part1 = () => {
@@ -33,7 +44,7 @@ const part1 = () => {
   lines.forEach((line) => {
     const numbers = line.split(" ").map(Number);
     const listOfSequences = generateSubsequences([numbers]); // Sequences in this line
-    nextValues.push(getNextValue(listOfSequences));
+    nextValues.push(getExtrapolatedValue(listOfSequences, "last"));
   });
 
   const sumOfValues = lodash.sum(nextValues);
@@ -41,7 +52,16 @@ const part1 = () => {
 };
 
 const part2 = () => {
-  console.log(`Solution part 2 is: ${null}`);
+  const begginingValues = [];
+
+  lines.forEach((line) => {
+    const numbers = line.split(" ").map(Number);
+    const listOfSequences = generateSubsequences([numbers]);
+    begginingValues.push(getExtrapolatedValue(listOfSequences, "beggining"));
+  });
+
+  const sumOfValues = lodash.sum(begginingValues);
+  console.log(`Solution part 2 is: ${sumOfValues}`);
 };
 
 part1();
